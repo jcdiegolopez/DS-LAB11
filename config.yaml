@@ -1,0 +1,61 @@
+seed: 42
+experiment_name: lab11-tikal-flores
+procedure_version: "0.1.0"
+
+paths:
+  data_dir: "data/raw/Datos Inguat"
+  work_dir: runs
+  approved_dir: approved
+  mlflow_dir: mlruns
+
+sources:
+  mobility:
+    file: BD_moviidad_mensual.xlsx
+    sheet: Peten
+  migration:
+    file: Base_Migracion_2009-2026jun.xlsx
+    sheet: Datos
+    visitor_types: [Turista, Excursionista]
+
+target:
+  name: "Tikal y Flores (Petén)"
+  unit: unique visitors per month
+  granularity: subdestination-month
+  subdestinations:
+    - Isla De Flores
+    - El Remate Y Alrededores Lago
+    - Mundo Maya Aeropuerto
+  exclude_countries: [Guatemala]
+
+coverage:
+  mobility_months:
+    - "2025-09"
+    - "2025-10"
+    - "2025-11"
+    - "2025-12"
+    - "2026-03"
+    - "2026-04"
+    - "2026-05"
+    - "2026-06"
+    - "2026-07"
+    - "2026-08"
+  months_to_estimate: ["2026-01", "2026-02"]
+  migration_first_period: "2009-01"
+  expected_last_period:
+    mobility: "2026-08"
+    migration: "2026-06"
+
+evaluation:
+  min_train_months: 3
+  eval_months: ["2025-12", "2026-03", "2026-04", "2026-05", "2026-06"]
+  baselines: [last_observed, prior_mean]
+
+# acceptance thresholds are set before looking at results, using the scale of the target
+thresholds:
+  max_missing_ratio: 0.05
+  max_mae: null
+  max_mae_ratio_vs_baseline: null
+  max_period_change_ratio: 0.5
+
+model_params:
+  factor_method: ratio_of_sums

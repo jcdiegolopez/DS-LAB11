@@ -1,0 +1,8 @@
+data/*
+!data/OneDrive_2026-10-29.zip
+approved/
+runs/
+mlruns/
+__pycache__/
+.pytest_cache/
+.venv/
