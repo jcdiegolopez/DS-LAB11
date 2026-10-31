@@ -90,6 +90,17 @@ class Thresholds(Strict):
     max_period_change_ratio: float
 
 
+class Monitoring(Strict):
+    max_row_change_ratio: float = 0.2
+    max_missing_ratio_increase: float = 0.01
+
+    @model_validator(mode="after")
+    def check_values(self) -> "Monitoring":
+        if self.max_row_change_ratio < 0 or self.max_missing_ratio_increase < 0:
+            raise ValueError("monitoring tolerances must be non-negative")
+        return self
+
+
 class ModelParams(Strict):
     factor_method: Literal["ratio_of_sums", "mean_of_ratios"]
 
@@ -105,6 +116,7 @@ class Config(Strict):
     evaluation: Evaluation
     thresholds: Thresholds
     model_params: ModelParams
+    monitoring: Monitoring = Monitoring()
 
     @model_validator(mode="after")
     def check_evaluation_months(self) -> "Config":

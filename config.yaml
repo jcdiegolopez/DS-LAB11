@@ -57,5 +57,10 @@ thresholds:
   max_mae_ratio_vs_baseline: null
   max_period_change_ratio: 0.5
 
+# monitors only alert; they never stop a run or block a publication
+monitoring:
+  max_row_change_ratio: 0.2
+  max_missing_ratio_increase: 0.01
+
 model_params:
   factor_method: ratio_of_sums
