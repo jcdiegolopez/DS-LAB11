@@ -14,6 +14,7 @@ import numpy as np
 
 from pipeline.config import Config, load_config
 from pipeline.contracts import PipelineState, RunContext, RunStatus
+from pipeline.monitoring.log import RunMonitor
 
 StageFn = Callable[[Config, PipelineState], None]
 
@@ -90,7 +91,13 @@ def main(argv: Sequence[str] | None = None, stages: Sequence[tuple[str, StageFn 
     args = parser.parse_args(argv)
 
     cfg = load_config(args.config)
-    state = execute(cfg, stages)
+    monitor = RunMonitor(cfg, load_stage)
+    state = execute(cfg, monitor.instrument(stages if stages is not None else DEFAULT_STAGES))
+
+    try:
+        monitor.finish(cfg, state)
+    except Exception as exc:
+        print(f"warning: monitoring failed, the run log is incomplete: {exc}", file=sys.stderr)
 
     try:
         from pipeline.tracking.recorder import record_run
@@ -103,6 +110,8 @@ def main(argv: Sequence[str] | None = None, stages: Sequence[tuple[str, StageFn 
     print(f"completed: {', '.join(state.completed_stages) or '-'}")
     if state.published:
         print(f"published: {state.published_dir}")
+    for alert in state.alerts:
+        print(f"alert: {alert}", file=sys.stderr)
     for warning in state.warnings:
         print(f"warning: {warning}", file=sys.stderr)
     for error in state.errors:

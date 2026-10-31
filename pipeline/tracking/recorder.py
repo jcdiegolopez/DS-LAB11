@@ -15,7 +15,7 @@ from pipeline.publish.store import META_FILE
 from pipeline.serialization import to_json, to_plain
 
 MAX_TEXT = 4000
-EXTRA_ARTIFACTS = ("quality_report.json", "quality_report.md")
+EXTRA_ARTIFACTS = ("quality_report.json", "quality_report.md", "run_log.json", "run_log.md")
 
 
 def tracking_uri(cfg: Config) -> str:
@@ -93,6 +93,7 @@ def build_tags(state: PipelineState) -> dict[str, str]:
         "published": str(state.published).lower(),
         "completed_stages": ",".join(state.completed_stages),
         "warning_count": str(len(state.warnings)),
+        "alert_count": str(len(state.alerts)),
     }
     if state.status is RunStatus.FAILED:
         tags["failure_cause"] = "; ".join(state.errors)

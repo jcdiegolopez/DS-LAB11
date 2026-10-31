@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Sequence
 
 from pipeline.config import load_config
+from pipeline.monitoring.log import log_restore
 from pipeline.publish.store import current_version, list_versions, restore
 
 
@@ -17,7 +18,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     action.add_argument("--to", metavar="RUN_ID", help="make this approved version the current one")
     args = parser.parse_args(argv)
 
-    approved_dir = load_config(args.config).paths.approved_dir
+    cfg = load_config(args.config)
+    approved_dir = cfg.paths.approved_dir
     if args.list:
         current = current_version(approved_dir)
         versions = list_versions(approved_dir)
@@ -27,12 +29,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"{'*' if version == current else ' '} {version}")
         return 0
 
+    previous = current_version(approved_dir)
     try:
         restore(approved_dir, args.to)
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
-    print(f"current version is now {args.to}")
+    log_restore(cfg, previous, args.to)
+    print(f"current version is now {args.to} (was {previous})")
     return 0
 
 
