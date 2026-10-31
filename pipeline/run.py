@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import os
 import random
 import subprocess
 import sys
@@ -35,7 +36,8 @@ def current_commit() -> str:
             ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True
         )
     except (OSError, subprocess.CalledProcessError):
-        return "unknown"
+        # containers have no repository; the commit is passed in by docker compose
+        return os.environ.get("GIT_COMMIT") or "unknown"
     return out.stdout.strip()
 
 

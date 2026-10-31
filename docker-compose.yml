@@ -1,0 +1,40 @@
+# Data, runs, approved versions and MLflow storage live on the host and are mounted;
+# none of them is copied into an image.
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: docker/pipeline.Dockerfile
+    image: lab11-pipeline
+    profiles: ["jobs"]
+    environment:
+      GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+      - ./runs:/app/runs
+      - ./approved:/app/approved
+      - ./mlruns:/app/mlruns
+
+  mlflow:
+    image: lab11-pipeline
+    build:
+      context: .
+      dockerfile: docker/pipeline.Dockerfile
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////app/mlruns/mlflow.db
+      --host 0.0.0.0 --port 5000
+    # same mount path as the pipeline: MLflow stores absolute artifact paths
+    volumes:
+      - ./mlruns:/app/mlruns
+    ports:
+      - "5000:5000"
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: ../docker/dashboard.Dockerfile
+    volumes:
+      - ./approved:/srv/approved:ro
+    ports:
+      - "8080:80"

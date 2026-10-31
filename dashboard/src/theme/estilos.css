@@ -1,0 +1,100 @@
+:root {
+  --fondo: #FAF8F4;
+  --tarjeta: #FFFFFF;
+  --tarjeta-oscura: #F1EDE4;
+  --tinta: #1B2430;
+  --titulo: #16365A;
+  --observado: #1F4E79;
+  --secundario: #4A90C2;
+  --atencion: #D9661F;
+  --atencion-texto: #A84B12;
+  --quetzal: #2E7D4F;
+  --contexto: #6B7280;
+  --borde: #E5E0D6;
+  --fuente-texto: Montserrat, system-ui, sans-serif;
+  --fuente-titular: "Bowlby One", Montserrat, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.app { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+
+.encabezado { border-bottom: 4px solid var(--quetzal); padding-bottom: 16px; margin-bottom: 24px; }
+.supra { margin: 0; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; font-size: 14px; color: var(--quetzal); }
+.encabezado h1 { font-family: var(--fuente-titular); font-weight: 400; color: var(--titulo); font-size: clamp(28px, 4vw, 44px); line-height: 1.1; margin: 4px 0 8px; }
+.bajada { margin: 0; color: var(--tinta); }
+
+.seccion { font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--contexto); margin: 32px 0 12px; }
+
+.tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tarjeta-encabezado h2 { margin: 0 0 8px; color: var(--titulo); font-size: 20px; }
+.tarjeta-id { display: inline-block; background: var(--titulo); color: #fff; font-size: 14px; border-radius: 4px; padding: 0 8px; margin-right: 6px; vertical-align: 2px; }
+.tarjeta-encabezado p { margin: 2px 0; font-size: 15px; }
+
+.controles { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; margin: 16px 0 8px; }
+.control-etiqueta { font-weight: 600; font-size: 14px; margin-right: 8px; }
+.grupo-botones { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.grupo-botones button {
+  font: inherit; font-size: 14px; padding: 6px 14px; border: 1px solid var(--observado);
+  background: var(--tarjeta); color: var(--observado); border-radius: 999px; cursor: pointer;
+}
+.grupo-botones button.activo { background: var(--observado); color: #fff; }
+.grupo-botones button:focus-visible, .casillas input:focus-visible, .enlace:focus-visible { outline: 3px solid var(--atencion); outline-offset: 2px; }
+
+.casillas { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 16px; border: 0; padding: 0; margin: 0; }
+.casillas legend { float: left; }
+.casillas label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+.casillas input { width: 16px; height: 16px; accent-color: var(--observado); }
+.muestra-linea { display: inline-block; width: 26px; height: 0; border-top-width: 3px; }
+.muestra-hw { border-top: 3px dashed var(--atencion); }
+.muestra-sarima { border-top: 3px dotted var(--secundario); }
+.muestra-lstm { border-top: 3px dashed var(--quetzal); border-image: repeating-linear-gradient(90deg, var(--quetzal) 0 8px, transparent 8px 11px, var(--quetzal) 11px 13px, transparent 13px 16px) 1; }
+
+.aviso-fijo { display: inline-block; background: var(--tarjeta-oscura); border-left: 4px solid var(--atencion); padding: 6px 12px; font-size: 14px; margin: 4px 0 8px; }
+.nota { font-size: 14px; color: var(--contexto); margin: 8px 0 0; }
+.sin-datos { padding: 48px 16px; text-align: center; color: var(--contexto); background: var(--tarjeta-oscura); border-radius: 8px; }
+
+.detalle-mes { font-size: 14px; background: var(--tarjeta-oscura); border-left: 4px solid var(--atencion); padding: 8px 12px; margin: 8px 0; }
+.enlace { font: inherit; font-size: 14px; background: none; border: 0; color: var(--observado); text-decoration: underline; cursor: pointer; margin-left: 12px; }
+
+.tabla-metricas { border-collapse: collapse; margin-top: 16px; font-size: 14px; min-width: 320px; }
+.tabla-metricas caption { text-align: left; font-weight: 600; margin-bottom: 6px; }
+.tabla-metricas th, .tabla-metricas td { padding: 6px 12px; border-bottom: 1px solid var(--borde); text-align: right; font-variant-numeric: tabular-nums; }
+.tabla-metricas th[scope="row"], .tabla-metricas thead th:first-child { text-align: left; font-weight: 500; }
+.tabla-metricas tr.apagado { color: var(--contexto); }
+
+.pie { font-size: 14px; color: var(--contexto); border-top: 1px solid var(--borde); padding-top: 12px; margin-top: 32px; }
+
+@media (max-width: 640px) {
+  .tarjeta { padding: 14px; }
+  .tabla-metricas { min-width: 0; width: 100%; }
+}
+
+/* Tablero del Lab 11 */
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; margin: 8px 0; }
+.leyenda > span { display: inline-flex; align-items: center; gap: 6px; }
+.muestra { display: inline-block; width: 22px; height: 12px; }
+.muestra-observado { border-top: 3px solid var(--observado); height: 0; }
+.muestra-estimacion { width: 12px; height: 12px; border: 3px solid var(--atencion); transform: rotate(45deg); background: var(--tarjeta); }
+.muestra-sin-dato { background: var(--tarjeta-oscura); border: 1px solid var(--borde); }
+.tabla-serie { width: 100%; max-width: 520px; }
+.tabla-serie tr.fila-estimacion td:last-child { color: var(--atencion-texto); font-weight: 600; }
+.sin-dato-celda { color: var(--contexto); font-style: italic; }
+.ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 24px; margin: 8px 0 0; }
+.ficha div { background: var(--tarjeta-oscura); border-radius: 8px; padding: 10px 14px; }
+.ficha dt { font-size: 13px; color: var(--contexto); }
+.ficha dd { margin: 2px 0 0; font-weight: 600; font-size: 17px; color: var(--titulo); overflow-wrap: anywhere; }
+.ficha code { font-size: 14px; }
+.lista { margin: 8px 0 12px; padding-left: 20px; }
+.aviso-bloque { display: block; }
+.no-disponible { background: var(--tarjeta); border: 1px solid var(--borde); border-left: 6px solid var(--atencion); border-radius: 12px; padding: 24px; }
+.no-disponible h2 { margin: 0 0 8px; color: var(--titulo); }

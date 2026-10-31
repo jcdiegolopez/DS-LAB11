@@ -1,0 +1,13 @@
+.git
+.venv
+data
+runs
+approved
+mlruns
+evidence
+docu
+notebooks
+dashboard/node_modules
+dashboard/dist
+**/__pycache__
+.pytest_cache
