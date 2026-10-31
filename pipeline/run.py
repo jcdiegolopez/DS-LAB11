@@ -76,17 +76,38 @@ def execute(
     return state
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+EXIT_CODES = {
+    RunStatus.SUCCESS: 0,
+    RunStatus.REJECTED: 2,
+    RunStatus.FAILED_CHECKS: 1,
+    RunStatus.FAILED: 1,
+}
+
+
+def main(argv: Sequence[str] | None = None, stages: Sequence[tuple[str, StageFn | str]] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pipeline.run")
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     args = parser.parse_args(argv)
 
-    state = execute(load_config(args.config))
+    cfg = load_config(args.config)
+    state = execute(cfg, stages)
+
+    try:
+        from pipeline.tracking.recorder import record_run
+
+        record_run(cfg, state)
+    except Exception as exc:
+        print(f"warning: the run was not recorded in MLflow: {exc}", file=sys.stderr)
+
     print(f"run_id={state.context.run_id} status={state.status.value}")
     print(f"completed: {', '.join(state.completed_stages) or '-'}")
+    if state.published:
+        print(f"published: {state.published_dir}")
+    for warning in state.warnings:
+        print(f"warning: {warning}", file=sys.stderr)
     for error in state.errors:
         print(f"error: {error}", file=sys.stderr)
-    return 0 if state.status is RunStatus.SUCCESS else 1
+    return EXIT_CODES[state.status]
 
 
 if __name__ == "__main__":
