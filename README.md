@@ -6,7 +6,7 @@ El alcance, los supuestos y el diagrama están en [`docs/alcance.md`](docs/alcan
 
 ## Estado
 
-En desarrollo. Disponibles: configuración validada, orquestador, controles de calidad, lectura, preparación, ajuste del factor, estimación, referencias simples, publicación de versiones aprobadas y registro en MLflow. Pendientes: la etapa de evaluación temporal con la regla de aceptación, el monitoreo, el tablero y Docker.
+En desarrollo. Disponibles: configuración validada, orquestador, controles de calidad, lectura, preparación, ajuste del factor, estimación, referencias simples, publicación de versiones aprobadas, registro en MLflow, monitoreo y simulacro de fallo controlado. Pendientes: la etapa de evaluación temporal con la regla de aceptación, el tablero y Docker.
 
 ## Requisitos
 
@@ -77,6 +77,34 @@ python -m pipeline.tracking.compare <run_a> <run_b> --rtol 1e-9
 ```
 
 Compara parámetros, métricas, commit y estimaciones, y termina con código 0 si son equivalentes.
+
+## Monitoreo
+
+Cada ejecución, exitosa o fallida, deja `runs/<run_id>/run_log.json` y `run_log.md` con el inicio y el fin, la duración y el resultado de cada etapa (`ok`, `blocked` si un control crítico la detuvo, `failed` si lanzó un error), las advertencias, los errores, el resultado de la publicación (versión aprobada antes y después) y los tres monitores. Además agrega una línea a `runs/monitoring_log.jsonl`, el historial que también registra cada restauración de versión. Ambos archivos se adjuntan a la corrida en MLflow.
+
+| Monitor | Qué revisa | Alerta cuando |
+|---|---|---|
+| Actualización (`freshness`) | El último mes de cada fuente frente a `coverage.expected_last_period` | Una fuente no llega al mes esperado, trae meses posteriores que la configuración no usa, o la versión aprobada se construyó con otras fuentes y esta ejecución no la reemplazó |
+| Calidad (`quality`) | Filas, faltantes, claves duplicadas y meses cubiertos frente a la ejecución anterior | Las filas cambian más de `monitoring.max_row_change_ratio`, los faltantes de una columna suben más de `monitoring.max_missing_ratio_increase`, aparecen duplicados o se pierde un mes |
+| Resultados (`results`) | Las estimaciones de la ejecución | Hay valores negativos o no finitos, o una estimación cambia más de `thresholds.max_period_change_ratio` frente al mes anterior o frente a la versión aprobada |
+
+Los monitores solo alertan: las alertas se imprimen como `alert:` y quedan en el registro, pero no cambian el código de salida ni bloquean la publicación. Eso lo deciden los controles de calidad y la regla de aceptación. La primera ejecución no tiene con qué comparar y queda como línea base del monitor de calidad.
+
+## Simulacro de fallo controlado
+
+```
+python -m pipeline.monitoring.drill --mode duplicate_key
+```
+
+Copia las fuentes en `runs/drill-<fecha>/data`, daña la copia, ejecuta el pipeline sobre ella, verifica que la versión aprobada siga vigente y con los mismos archivos, y vuelve a ejecutar con las fuentes originales (la corrección). La evidencia queda en `evidence/fault_drill_<modo>_<fecha>.md`. Los archivos originales no se modifican.
+
+| Modo | Daño | Control que debe detenerlo |
+|---|---|---|
+| `missing_column` | Quita la columna `pais` de la hoja de movilidad | `columns_types` |
+| `duplicate_key` | Duplica una fila de movilidad | `uniqueness` |
+| `zero_denominator` | Pone en cero la migración de enero de 2026 | `values_denominators` |
+
+Termina con código 0 si el fallo se detectó, la versión aprobada se conservó y la corrida corregida pasó la validación. Para demostrar la recuperación completa conviene correrlo cuando ya existe una versión aprobada, y después probar `python -m pipeline.publish.restore --to <run_id>` para volver a una versión anterior.
 
 ## Contrato entre etapas
 
