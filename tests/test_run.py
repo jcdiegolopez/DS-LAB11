@@ -1,18 +1,5 @@
-from pathlib import Path
-
-import pytest
-
-from pipeline.config import Config, load_config
 from pipeline.contracts import CheckResult, CheckStatus, RunStatus
 from pipeline.run import execute
-
-ROOT = Path(__file__).resolve().parent.parent
-
-
-@pytest.fixture
-def cfg(tmp_path) -> Config:
-    loaded = load_config(ROOT / "config.yaml")
-    return loaded.model_copy(update={"paths": loaded.paths.model_copy(update={"work_dir": tmp_path})})
 
 
 def test_all_stages_run_in_order(cfg):
