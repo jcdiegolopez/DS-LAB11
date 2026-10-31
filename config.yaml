@@ -50,11 +50,15 @@ evaluation:
   eval_months: ["2025-12", "2026-03", "2026-04", "2026-05", "2026-06"]
   baselines: [last_observed, prior_mean]
 
-# acceptance thresholds are set before looking at results, using the scale of the target
+# acceptance thresholds are set before looking at results, using the scale of the target.
+# Observed foreign visitors in the evaluated months range from about 4,900 to 13,200 per
+# subdestination (mean near 7,700), so an overall MAE of 2,000 is roughly a quarter of the
+# typical level. With only five evaluable months the model is only asked not to lose against
+# the best simple reference (ratio 1.0), not to beat it by a margin.
 thresholds:
   max_missing_ratio: 0.05
-  max_mae: null
-  max_mae_ratio_vs_baseline: null
+  max_mae: 2000
+  max_mae_ratio_vs_baseline: 1.0
   max_period_change_ratio: 0.5
 
 # monitors only alert; they never stop a run or block a publication

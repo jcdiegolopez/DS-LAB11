@@ -15,7 +15,9 @@ from pipeline.publish.store import META_FILE
 from pipeline.serialization import to_json, to_plain
 
 MAX_TEXT = 4000
-EXTRA_ARTIFACTS = ("quality_report.json", "quality_report.md", "run_log.json", "run_log.md")
+EXTRA_ARTIFACTS = (
+    "quality_report.json", "quality_report.md", "evaluation.csv", "evaluation.json", "run_log.json", "run_log.md",
+)
 
 
 def tracking_uri(cfg: Config) -> str:
