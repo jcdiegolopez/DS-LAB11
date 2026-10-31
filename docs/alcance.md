@@ -74,7 +74,9 @@ Supuestos:
 
 ## 5. Archivo que consume el tablero
 
-`approved/current/estimates.csv`, junto a `meta.json` con las métricas, los resultados de los controles y los períodos evaluados.
+Cada versión aprobada vive en `approved/<run_id>/` con dos archivos: `estimates.csv` y `meta.json` (métricas, resultados de los controles, parámetros del modelo, huella de las fuentes y commit). El archivo de texto `approved/current` contiene el identificador de la versión vigente, y el tablero lee primero ese puntero y luego los archivos de esa versión.
+
+Una versión se crea completa en una carpeta temporal y solo después se mueve el puntero, de modo que una falla a medias nunca deja al tablero con una versión incompleta. Las versiones anteriores no se borran, y `python -m pipeline.publish.restore --to <run_id>` devuelve el puntero a cualquiera de ellas. Las columnas `run_id`, `generated_at` y `procedure_version` las fija la publicación en el momento de aprobar.
 
 | Columna | Contenido |
 |---|---|
